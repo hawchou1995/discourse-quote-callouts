@@ -69,13 +69,16 @@ class QuoteCallouts {
             return shortcuts;
           }
 
-          shortcuts.composing.shortcuts.callout = `
-            <span class="delimiter-or" dir="ltr">
-              <kbd>Ctrl</kbd>
-              <kbd>Alt</kbd>
-              <kbd>C</kbd>
-            </span>
-            ${i18n(themePrefix("composer.insert_callout"))}`;
+          shortcuts.composing.shortcuts.callout = {
+            shortcut: `
+              <span class="delimiter-or" dir="ltr">
+                <kbd>Ctrl</kbd>
+                <kbd>Alt</kbd>
+                <kbd>C</kbd>
+              </span>`,
+            shortcutTexts: ["Ctrl Alt C"],
+            description: i18n(themePrefix("composer.insert_callout")),
+          };
           return shortcuts;
         }
       };
