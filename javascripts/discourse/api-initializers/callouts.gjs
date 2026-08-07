@@ -103,14 +103,27 @@ class QuoteCallouts {
       };
     });
 
-    api.modifyClass("model:topic", (Superclass) => {
-      return class extends Superclass {
-        @computed("excerpt")
-        get escapedExcerpt() {
-          return super.escapedExcerpt?.replace(CALLOUT_EXCERPT_REGEX, "");
-        }
-      };
-    });
+    // Strips callout markers from topic excerpts (topic cards, search results).
+    // Modifying store models via `modifyClass` triggers the
+    // `discourse.modify-class-model` deprecation (Discourse >= 2026.8), so we
+    // use the dedicated core "topic-escaped-excerpt" value transformer instead.
+    // `api.registerValueTransformer` exists since Discourse 3.4, which is also
+    // when the transformers API was introduced.
+    if (typeof api.registerValueTransformer === "function") {
+      api.registerValueTransformer("topic-escaped-excerpt", ({ value }) => {
+        return value?.replace(CALLOUT_EXCERPT_REGEX, "");
+      });
+    } else {
+      // Fallback for older Discourse versions without the transformers API.
+      api.modifyClass("model:topic", (Superclass) => {
+        return class extends Superclass {
+          @computed("excerpt")
+          get escapedExcerpt() {
+            return super.escapedExcerpt?.replace(CALLOUT_EXCERPT_REGEX, "");
+          }
+        };
+      });
+    }
 
     // Strips callout marker only on collapsed quote (see PostQuotedContent)
     api.modifyClass("component:post/cooked-html", (Superclass) => {
